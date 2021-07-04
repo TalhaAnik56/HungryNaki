@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <style>
+     #searchUnit{margin-top: 40px;margin-bottom: 30px;}
+     #resultUnit{display: grid;grid-template-columns: repeat(4,1fr);grid-gap: 20px;margin-left: 50px;}
+     .detailsDivClass img{width: 350px;border-radius: 10px;}
+     .detailsDivClass{margin-left: 100px;margin-top: 100px;display: grid;grid-template-columns: repeat(2,1fr);grid-gap: 20px;}
+     #detailsUnit{display: none;}
+    </style>
+</head>
+<body>
+    <div class="d-flex justify-content-center" id="searchUnit">
+    <input id="inputMeal" type="text" placeholder="Enter the meal name">
+    <button class="btn btn-success" id="searchButton">Search</button>
+    </div>
+
+    <div id="resultUnit">
+    </div>
+
+    <div id="detailsUnit"></div>
+
+    
+    
+    <script>
+        document.getElementById("searchButton").addEventListener('click',function(event){
+            const inputMeal=document.getElementById("inputMeal").value;
+             document.getElementById("resultUnit").style.display="grid";
+             document.getElementById("detailsUnit").style.display="none";
+           
+            fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?a=${inputMeal}`)
+            .then(reply=>reply.json())
+            .then(data=>{displayData(data)})
+        })
+        
+        const displayData=(data)=>{
+            const menu=data.meals;
+            const resultDiv=document.getElementById("resultUnit");
+            resultDiv.innerHTML="";
+           
+            menu.forEach(food => {
+                const div=document.createElement("div");
+                div.innerHTML=`<div onclick="particularInformation(${food.idMeal})" class="card" style="width: 18rem;">
+                    <img class="card-img-top" src="${food.strMealThumb}" alt="Card image cap">
+            <div class="card-body">
+              <h5 class="card-title">${food.strMeal}</h5>
+              <a href="#" class="stretched-link"></a>
+            </div>
+          </div>`
+                resultDiv.appendChild(div);
+            });
+      }
+
+      const particularInformation=particularFood=>{
+        document.getElementById("resultUnit").style.display="none";
+        document.getElementById("detailsUnit").style.display="block";
+
+         fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${particularFood}`)
+         .then(reply=>reply.json())
+         
+         .then(data=>{showingDetails(data)})
+
+      }
+
+      const showingDetails=foodUnit=>{
+           const wholeFoodUnit=foodUnit.meals[0];
+           const detailsUnit=document.getElementById("detailsUnit");
+           detailsUnit.innerHTML="";
+           const detailsDiv=document.createElement("div");
+           detailsDiv.className="detailsDivClass container"
+           detailsDiv.innerHTML=`<div><img src="${wholeFoodUnit.strMealThumb}"></div>
+           <div><h1>${wholeFoodUnit.strMeal}</h1>
+           <h2>Ingredients:</h2>
+           <ul>
+        <li>${wholeFoodUnit.strIngredient1}</li>
+        <li>${wholeFoodUnit.strIngredient2}</li>
+        <li>${wholeFoodUnit.strIngredient3}</li>
+        <li>${wholeFoodUnit.strIngredient4}</li>
+        <li>${wholeFoodUnit.strIngredient5}</li>
+        <li>${wholeFoodUnit.strIngredient6}</li>
+        <li>${wholeFoodUnit.strIngredient7}</li>
+        <li>${wholeFoodUnit.strIngredient8}</li>
+        <li>${wholeFoodUnit.strIngredient9}</li>
+        <li>${wholeFoodUnit.strIngredient10}</li>
+    </ul></div>`
+       detailsUnit.appendChild(detailsDiv);
+      }
+    </script>
+</body>
+</html>
